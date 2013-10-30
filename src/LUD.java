@@ -1,3 +1,15 @@
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -91,7 +103,7 @@ public class LUD extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -115,8 +127,19 @@ public class LUD extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new LUD().setVisible(true);
+
             }
         });
+
+        try {
+            update();
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(LUD.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(LUD.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.exit(0);
+
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -124,4 +147,51 @@ public class LUD extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JProgressBar jProgressBar1;
     // End of variables declaration//GEN-END:variables
+
+    private static boolean c_Folder;
+    private static int Status;
+    private static String sep = System.getProperty("file.separator");
+    private static String path = System.getProperty("user.home") + sep +"Appdata"+sep+"Roaming"+sep+ ".yahtzoid" + sep;
+    private static BufferedInputStream in = null;
+    private static String jar = "https://dl.dropboxusercontent.com/u/57469303/Yahtzoid/Launcher.jar";
+
+    public static void update() throws MalformedURLException, IOException
+    {
+        deleteOldLauncher(path+"Launcher.jar");
+        //gen_Folders(sep+"updater"); //Puts .jar here
+        getFilesFromServer(jar,"Launcher.jar");
+    }
+
+    public static void gen_Folders(String newLoc)
+    {
+        c_Folder = (new File(path+newLoc)).mkdirs();
+    }
+
+    public static void deleteOldLauncher(String oldLoc)
+    {
+        boolean success = (new File(oldLoc)).delete();
+    }
+
+    public static void getFilesFromServer(String fileUrl, String saveLocation) throws IOException
+    {
+        FileOutputStream fout = null;
+        try
+        {
+            in = new BufferedInputStream(new URL(fileUrl).openStream());
+            fout = new FileOutputStream(path + saveLocation);
+            byte data[] = new byte[1024];
+            int count;
+            while ((count = in.read(data, 0, 1024)) != -1)
+            {
+                fout.write(data, 0, count);
+            }
+        }
+        finally
+        {
+            if (in != null)
+                in.close();
+            if (fout != null)
+                fout.close();
+        }
+    }
 }
