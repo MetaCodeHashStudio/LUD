@@ -24,7 +24,6 @@ public final class LUD extends javax.swing.JFrame {
      */
     public LUD() {
         initComponents();
-        Start();
         
     }
 
@@ -117,16 +116,12 @@ public final class LUD extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(LUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new LUD().setVisible(true);
                 
             }
         });
-        
-        
         
     }
     private void Status(java.beans.PropertyChangeEvent evt) {                                             
@@ -191,7 +186,7 @@ public final class LUD extends javax.swing.JFrame {
                 Status+=10;
                 jProgressBar1.setValue(Status);
                 Thread.sleep(100);
-                System.out.println(data + " "+ count);
+                System.out.println(count);
                 fout.write(data, 0, count);
             }
         }
@@ -201,6 +196,15 @@ public final class LUD extends javax.swing.JFrame {
                 in.close();
             if (fout != null)
                 fout.close();
+        }
+    }
+    
+    private class Starter
+    {
+        public void starter()
+        {
+            Start();
+            System.exit(0);
         }
     }
 }
