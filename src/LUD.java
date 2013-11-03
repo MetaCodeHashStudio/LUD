@@ -12,7 +12,6 @@ import java.util.logging.Logger;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Runnetty
@@ -24,7 +23,8 @@ public final class LUD extends javax.swing.JFrame {
      */
     public LUD() {
         initComponents();
-        
+
+
     }
 
     @SuppressWarnings("unchecked")
@@ -116,36 +116,36 @@ public final class LUD extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(LUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+
+        /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new LUD().setVisible(true);
-                
+
             }
         });
-        
+
+
+
     }
-    private void Status(java.beans.PropertyChangeEvent evt) {                                             
-        System.out.println("LOL");
+
+    private void Status(java.beans.PropertyChangeEvent evt) {
         jProgressBar1.setValue(Status);
     }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JProgressBar jProgressBar1;
     // End of variables declaration//GEN-END:variables
-
     private static boolean c_Folder;
     private static int Status;
     private static String sep = System.getProperty("file.separator");
-    private static String path = System.getProperty("user.home") + sep +"Appdata"+sep+"Roaming"+sep+ ".yahtzoid" + sep;
+    private static String path = System.getProperty("user.home") + sep + "Appdata" + sep + "Roaming" + sep + ".yahtzoid" + sep;
     private static BufferedInputStream in = null;
     private static String jar = "https://dl.dropboxusercontent.com/u/57469303/Yahtzoid/Launcher.jar";
 
-    
-    public void Start()
-    {
+    public void Start() {
         try {
             update();
         } catch (MalformedURLException ex) {
@@ -156,55 +156,41 @@ public final class LUD extends javax.swing.JFrame {
             Logger.getLogger(LUD.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    public void update() throws MalformedURLException, IOException, InterruptedException
-    {
-        deleteOldLauncher(path+"Launcher.jar");
-        getFilesFromServer(jar,"Launcher.jar");
+
+    public void update() throws MalformedURLException, IOException, InterruptedException {
+        deleteOldLauncher(path + "Launcher.jar");
+        getFilesFromServer(jar, "Launcher.jar");
     }
 
-    public static void gen_Folders(String newLoc)
-    {
-        c_Folder = (new File(path+newLoc)).mkdirs();
+    public static void gen_Folders(String newLoc) {
+        c_Folder = (new File(path + newLoc)).mkdirs();
     }
 
-    public static void deleteOldLauncher(String oldLoc)
-    {
+    public static void deleteOldLauncher(String oldLoc) {
         boolean success = (new File(oldLoc)).delete();
     }
 
-    public  void getFilesFromServer(String fileUrl, String saveLocation) throws IOException, InterruptedException
-    {
+    public void getFilesFromServer(String fileUrl, String saveLocation) throws IOException, InterruptedException {
         FileOutputStream fout = null;
-        try
-        {
+        try {
             in = new BufferedInputStream(new URL(fileUrl).openStream());
             fout = new FileOutputStream(path + saveLocation);
             byte data[] = new byte[1024];
             int count;
-            while ((count = in.read(data, 0, 1024)) != -1)
-            {
-                Status+=10;
+            while ((count = in.read(data, 0, 1024)) != -1) {
+                Status += 10;
                 jProgressBar1.setValue(Status);
                 Thread.sleep(100);
-                System.out.println(count);
+                System.out.println(data + " " + count);
                 fout.write(data, 0, count);
             }
-        }
-        finally
-        {
-            if (in != null)
+        } finally {
+            if (in != null) {
                 in.close();
-            if (fout != null)
+            }
+            if (fout != null) {
                 fout.close();
-        }
-    }
-    
-    private class Starter
-    {
-        public void starter()
-        {
-            Start();
-            System.exit(0);
+            }
         }
     }
 }
