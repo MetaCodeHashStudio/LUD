@@ -3,7 +3,6 @@ import java.awt.EventQueue;
 public class Start {
 
     public static LUD frame;
-    
 
     public static void main(String[] args) {
         EventQueue.invokeLater(
@@ -13,11 +12,15 @@ public class Start {
                     frame = new LUD();
                     frame.setLocation(600, 400);
                     frame.setVisible(true);
+                    frame.Start();
+                    
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                
+               
             }
         });
     }
+    
+
 }

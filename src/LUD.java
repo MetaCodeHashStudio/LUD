@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -90,55 +91,14 @@ public final class LUD extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) throws InterruptedException {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(LUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(LUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(LUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(LUD.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new LUD().setVisible(true);
-
-            }
-        });
-
-
-
-    }
-
-    private void Status(java.beans.PropertyChangeEvent evt) {
-        jProgressBar1.setValue(Status);
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JProgressBar jProgressBar1;
     // End of variables declaration//GEN-END:variables
-    private static boolean c_Folder;
+   private static boolean c_Folder;
     private static int Status;
     private static String sep = System.getProperty("file.separator");
     private static String path = System.getProperty("user.home") + sep + "Appdata" + sep + "Roaming" + sep + ".yahtzoid" + sep;
@@ -146,6 +106,7 @@ public final class LUD extends javax.swing.JFrame {
     private static String jar = "https://dl.dropboxusercontent.com/u/57469303/Yahtzoid/Launcher.jar";
 
     public void Start() {
+        System.out.println("Starting");
         try {
             update();
         } catch (MalformedURLException ex) {
@@ -175,13 +136,19 @@ public final class LUD extends javax.swing.JFrame {
         try {
             in = new BufferedInputStream(new URL(fileUrl).openStream());
             fout = new FileOutputStream(path + saveLocation);
+
+            URL url = new URL(fileUrl);
+            URLConnection conection = url.openConnection();
+            conection.connect();
+
             byte data[] = new byte[1024];
             int count;
+            int total = 0;
+            int lenghtOfFile = conection.getContentLength();
+
             while ((count = in.read(data, 0, 1024)) != -1) {
-                Status += 10;
-                jProgressBar1.setValue(Status);
-                Thread.sleep(100);
-                System.out.println(data + " " + count);
+                total += count;
+                onProgressUpdate(""+(int)((total*100)/lenghtOfFile));
                 fout.write(data, 0, count);
             }
         } finally {
@@ -192,5 +159,10 @@ public final class LUD extends javax.swing.JFrame {
                 fout.close();
             }
         }
+    }
+
+    protected void onProgressUpdate(String... progress) {
+        System.out.println(Integer.parseInt(progress[0]));
+        jProgressBar1.setValue(Integer.parseInt(progress[0]));
     }
 }
