@@ -1,5 +1,4 @@
 
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -11,19 +10,12 @@ import java.net.URLConnection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 /**
- *
- * @author Runnetty
+ * @author Runnetty @ MetaCode Studio
+ * www.metacodestudio.com
  */
 public final class LUD extends javax.swing.JFrame {
 
-    /**
-     * Creates new form LUD
-     */
     public LUD() {
         initComponents();
     }

@@ -18,11 +18,9 @@ public class Start {
                     frame = new LUD();
                     frame.setLocation(600, 400);
                     frame.setVisible(true);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         });
         synchronized (frame) {
@@ -34,8 +32,6 @@ public class Start {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-           
            try {
             Process proc = Runtime.getRuntime().exec("java -jar .."+ LUD.sep+"Launcher.jar");
         } catch (IOException ex) {}
