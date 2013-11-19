@@ -1,4 +1,6 @@
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -24,8 +26,6 @@ public final class LUD extends javax.swing.JFrame {
      */
     public LUD() {
         initComponents();
-
-
     }
 
     @SuppressWarnings("unchecked")
@@ -90,20 +90,21 @@ public final class LUD extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JProgressBar jProgressBar1;
     // End of variables declaration//GEN-END:variables
-   private static boolean c_Folder;
+    private static boolean c_Folder;
     private static int Status;
-    private static String sep = System.getProperty("file.separator");
-    private static String path = System.getProperty("user.home") + sep + "Appdata" + sep + "Roaming" + sep + ".yahtzoid" + sep;
+    private String commandToRun;
+    private boolean waitState = true;
+    public ActionListener actionListener;
+    public static String sep = System.getProperty("file.separator");
+    private static String path = ".."+sep+""; //Download path
     private static BufferedInputStream in = null;
-    private static String jar = "https://dl.dropboxusercontent.com/u/57469303/Yahtzoid/Launcher.jar";
+    private static String jar = "https://dl.dropboxusercontent.com/u/57469303/Yahtzoid/Launcher.jar"; //File URL
 
     public void Start() {
         System.out.println("Starting");
@@ -111,10 +112,12 @@ public final class LUD extends javax.swing.JFrame {
             update();
         } catch (MalformedURLException ex) {
             Logger.getLogger(LUD.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
+        } catch (IOException | InterruptedException ex) {
             Logger.getLogger(LUD.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(LUD.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        waitState = false;
+        synchronized (this) {
+            notifyAll();
         }
     }
 
@@ -148,8 +151,9 @@ public final class LUD extends javax.swing.JFrame {
 
             while ((count = in.read(data, 0, 1024)) != -1) {
                 total += count;
-                onProgressUpdate(""+(int)((total*100)/lenghtOfFile));
+                onProgressUpdate("" + (int) ((total * 100) / lenghtOfFile));
                 fout.write(data, 0, count);
+                Thread.sleep(10);
             }
         } finally {
             if (in != null) {
@@ -164,5 +168,9 @@ public final class LUD extends javax.swing.JFrame {
     protected void onProgressUpdate(String... progress) {
         System.out.println(Integer.parseInt(progress[0]));
         jProgressBar1.setValue(Integer.parseInt(progress[0]));
+    }
+
+    public boolean getWaitState() {
+        return waitState;
     }
 }
