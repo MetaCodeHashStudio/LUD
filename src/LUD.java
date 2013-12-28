@@ -1,19 +1,20 @@
 
-import java.awt.event.ActionListener;
+
+/**
+ * @author Runnetty aka Mats Harwiss
+ * @ MetaCode Studio www.metacodestudio.com
+ */
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
-/**
- * @author Runnetty @ MetaCode Studio
- * www.metacodestudio.com
- */
 public final class LUD extends javax.swing.JFrame {
 
     public LUD() {
@@ -30,8 +31,10 @@ public final class LUD extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle(Start.version);
         setBackground(new java.awt.Color(255, 255, 255));
         setCursor(new java.awt.Cursor(java.awt.Cursor.WAIT_CURSOR));
+        setForeground(new java.awt.Color(255, 255, 255));
         setLocationByPlatform(true);
         setName("MetaCode Updater"); // NOI18N
         setResizable(false);
@@ -40,7 +43,7 @@ public final class LUD extends javax.swing.JFrame {
         jProgressBar1.setStringPainted(true);
 
         jLabel1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
-        jLabel1.setText("MetaCode Updater v1");
+        jLabel1.setText("MetaCode Updater");
         jLabel1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
 
         jLabel3.setFont(new java.awt.Font("Candara", 1, 12)); // NOI18N
@@ -60,7 +63,7 @@ public final class LUD extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1)
                             .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 138, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 53, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 68, Short.MAX_VALUE)
                         .addComponent(jLabel2))
                     .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
@@ -88,24 +91,23 @@ public final class LUD extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JProgressBar jProgressBar1;
     // End of variables declaration//GEN-END:variables
-    private static boolean c_Folder;
     private static int Status;
-    private String commandToRun;
     private boolean waitState = true;
-    public ActionListener actionListener;
-    public static String sep = System.getProperty("file.separator");
-    private static String path = ".."+sep+""; //Download path
+    public static String seperator = System.getProperty("file.separator");
+    protected static URL url;
+    protected static URLConnection connection;
     private static BufferedInputStream in = null;
-    private static String jar = "https://dl.dropboxusercontent.com/u/57469303/Yahtzoid/Launcher.jar"; //File URL
+    protected static String jar = "https://dl.dropboxusercontent.com/u/57469303/Yahtzoid/Launcher.jar"; //File URL
 
-    public void Start() {
-        System.out.println("Starting");
-        try {
-            update();
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(LUD.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException | InterruptedException ex) {
-            Logger.getLogger(LUD.class.getName()).log(Level.SEVERE, null, ex);
+    public void Start() throws URISyntaxException, IOException, InterruptedException {
+        if (connectToMain(jar)) {
+            System.out.println("| - DELETING OLD FILES:\n| - " + mainFolder() + "Launcher.jar");
+            deleteOldLauncher(mainFolder() + "Launcher.jar");
+
+            System.out.println("| - DOWNLOADING UPDATE:\n| - " + jar);
+            getFilesFromServer(jar, "Launcher.jar");
+
+            System.out.println("| - DOWNLOAD: COMPLEETE");
         }
         waitState = false;
         synchronized (this) {
@@ -113,33 +115,51 @@ public final class LUD extends javax.swing.JFrame {
         }
     }
 
-    public void update() throws MalformedURLException, IOException, InterruptedException {
-        deleteOldLauncher(path + "Launcher.jar");
-        getFilesFromServer(jar, "Launcher.jar");
+    protected boolean connectToMain(String fileUrl) {
+        try {
+            url = new URL(fileUrl);
+        } catch (MalformedURLException ex) {
+            System.out.println("Invalid URL.");
+            JOptionPane.showMessageDialog(Start.window, "Invalid URL.");
+            return false;
+        }
+        try {
+            connection = url.openConnection();
+        } catch (IOException ex) {
+            System.out.println("There was a error while trying to open connection to URL");
+            JOptionPane.showMessageDialog(Start.window, "There was a error while trying to open connection to URL");
+            return false;
+        }
+        System.out.println("| - Opening Connection...");
+        try {
+            connection.connect();
+            System.out.println("| - Connected");
+        } catch (IOException ex) {
+            System.out.println("Connection to the URL was rejected. Make sure you are connected to the internet and try again.");
+            JOptionPane.showMessageDialog(Start.window, "Connection to the URL was rejected. Make sure you are connected to the internet and try again.");
+            return false;
+        }
+        return true;
     }
-
-    public static void gen_Folders(String newLoc) {
-        c_Folder = (new File(path + newLoc)).mkdirs();
+    
+    public static void createFolder(String newLocation) throws URISyntaxException {
+        boolean createFolder = (new File(mainFolder() + newLocation)).mkdirs();
     }
 
     public static void deleteOldLauncher(String oldLoc) {
         boolean success = (new File(oldLoc)).delete();
     }
 
-    public void getFilesFromServer(String fileUrl, String saveLocation) throws IOException, InterruptedException {
+    public void getFilesFromServer(String fileUrl, String saveLocation) throws IOException, InterruptedException, URISyntaxException {
         FileOutputStream fout = null;
         try {
             in = new BufferedInputStream(new URL(fileUrl).openStream());
-            fout = new FileOutputStream(path + saveLocation);
-
-            URL url = new URL(fileUrl);
-            URLConnection conection = url.openConnection();
-            conection.connect();
+            fout = new FileOutputStream(mainFolder() + saveLocation);
 
             byte data[] = new byte[1024];
             int count;
             int total = 0;
-            int lenghtOfFile = conection.getContentLength();
+            int lenghtOfFile = connection.getContentLength();
 
             while ((count = in.read(data, 0, 1024)) != -1) {
                 total += count;
@@ -158,11 +178,17 @@ public final class LUD extends javax.swing.JFrame {
     }
 
     protected void onProgressUpdate(String... progress) {
-        System.out.println(Integer.parseInt(progress[0]));
         jProgressBar1.setValue(Integer.parseInt(progress[0]));
     }
 
     public boolean getWaitState() {
         return waitState;
+    }
+
+    public static String mainFolder() throws URISyntaxException {
+        String filePath = new File(Start.class.getProtectionDomain()
+                .getCodeSource().getLocation().toURI().getPath()).toString();
+        filePath = filePath.substring(0, filePath.length() - 13);
+        return filePath;
     }
 }
